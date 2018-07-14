@@ -1,7 +1,7 @@
 class Banner extends React.Component {
   render() {
     return (
-      <h1>
+      <h1 className="jumbotron">
         My Restaurant
       </h1>
     );
@@ -30,16 +30,16 @@ class EmailForm extends React.Component {
     return (
       <form onSubmit={this.handleSubmit}>
         <div className="form-group">
-          <label for="emailAddress">Please enter your email address:</label>
+          <label htmlFor="emailAddress">Please enter your email address:</label>
           <input type="email" className="form-control" id="emailAddress" placeholder="Email" value={this.state.emailAddress} onChange={this.handleChange} />
         </div>
-        <input type="submit" value="Submit" />
+        <button type="submit" className="btn btn-primary">Submit</button>
       </form>
     );
   }
 }
 
-class Browse extends React.Component {
+class NavBar extends React.Component {
 
   render() {
     return (
@@ -50,12 +50,24 @@ class Browse extends React.Component {
   }
 }
 
+class Content extends React.Component {
+
+  render() {
+    return (
+          <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="#">Browse</a></li>
+            <li role="presentation"><a href="#">MyList</a></li>
+          </ul>
+    );
+  }
+}
+
 class Layout extends React.Component {
 
   render() {
     return (
       <div className="container">
-      <div className="row">
+        <div className="row">
           <div className="col-xs-12">
             <Banner />
           </div>
@@ -67,7 +79,7 @@ class Layout extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            <Browse />
+            <Content />
           </div>
         </div>
       </div>
