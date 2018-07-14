@@ -1,3 +1,53 @@
+const { combineReducers, createStore } = Redux;
+const DEFAULT = 'default';
+
+// action
+var enterEmail = email => ({
+  type: 'ENTER_EMAIL',
+  value: email
+});
+
+var retrieveRestaurants = restaurants => ({
+  type: 'RETRIEVE_RESTAURANTS',
+  value: restaurants
+});
+
+// reducer
+const restaurantList = function (state = { status: DEFAULT, value: DEFAULT }, action) {
+  switch (action.type) {
+
+    case 'RETRIEVE_RESTAURANTS':
+      return Object.assign({}, state, {
+        status: 'restaurants retrieved',
+        value: action.value
+      })
+    default:
+      return state;
+  }
+}
+
+const emailInput = function (state = { status: DEFAULT, value: DEFAULT }, action) {
+  switch (action.type) {
+    case 'ENTER_EMAIL':
+      return Object.assign({}, state, {
+        status: 'email entered',
+        value: action.value
+      })
+    default:
+      return state;
+  }
+}
+
+const combineReducer = combineReducers({
+  restaurantList,
+  emailInput
+});
+
+// store
+const store = createStore(combineReducer);
+
+
+// react component
 class Banner extends React.Component {
   render() {
     return (
@@ -22,8 +72,11 @@ class EmailForm extends React.Component {
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.emailAddress);
+    let emailAddress = this.state.emailAddress;
+    alert('A name was submitted: ' + emailAddress);
     event.preventDefault();
+    // dispatch action
+    store.dispatch(enterEmail(emailAddress));
   }
 
   render() {
@@ -66,14 +119,16 @@ class RestaurantResultRow extends React.Component {
 class RestaurantResultTable extends React.Component {
   render() {
     const rows = [];
-    
-    this.props.restaurants.forEach((restaurant) => {
-      rows.push(
-        <RestaurantResultRow
-        restaurant={restaurant}
-          key={restaurant.name} />
-      );
-    });
+
+    if (this.props.restaurants !== DEFAULT) {
+      this.props.restaurants.forEach((restaurant) => {
+        rows.push(
+          <RestaurantResultRow
+            restaurant={restaurant}
+            key={restaurant.name} />
+        );
+      });
+    }
 
     return (
       <table>
@@ -94,7 +149,7 @@ class RestaurantSearch extends React.Component {
 
     return (
       <div>
-        <RestaurantResultTable restaurants={restaurants}/>
+        <RestaurantResultTable restaurants={restaurants} />
       </div>
     );
   }
@@ -112,7 +167,7 @@ class Content extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-6">
-          < RestaurantSearch restaurants={restaurants}/>
+            < RestaurantSearch restaurants={restaurants} />
           </div>
           <div className="col-xs-6">
           </div>
@@ -139,7 +194,7 @@ class Layout extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            <Content restaurants={restaurants}/>
+            <Content restaurants={restaurants} />
           </div>
         </div>
       </div>
@@ -147,17 +202,21 @@ class Layout extends React.Component {
   }
 }
 
-var restaurants;
-function setRestaurants(json) {
-  console.log(json)
-  restaurants = json;
+function fetchRestaurant() {
+  fetch("/getRestaurants")
+    .then(response => response.json())
+    .then(json => store.dispatch(retrieveRestaurants(json)));
 }
-fetch("/getRestaurants")
-.then(response => response.json())
-    .then(json => setRestaurants(json))
-     
+//fetchRestaurant();
 
-ReactDOM.render(
-  <Layout restaurants={restaurants = []}/>,
-  document.getElementById('root')
-);
+const render = function () {
+  var state = store.getState();
+  ReactDOM.render(
+    <Layout restaurants={state.restaurantList.value} />,
+    document.getElementById('root')
+  );
+};
+
+
+store.subscribe(render);
+render();
