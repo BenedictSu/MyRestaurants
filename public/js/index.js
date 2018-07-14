@@ -43,28 +43,88 @@ class NavBar extends React.Component {
 
   render() {
     return (
+      <ul className="nav nav-tabs">
+        <li role="presentation" className="active"><a href="#">Browse</a></li>
+        <li role="presentation"><a href="#">MyList</a></li>
+      </ul>
+    );
+  }
+}
+
+class RestaurantResultRow extends React.Component {
+  render() {
+    const restaurant = this.props.restaurant;
+
+    return (
+      <tr>
+        <td>{restaurant.name}</td>
+      </tr>
+    );
+  }
+}
+
+class RestaurantResultTable extends React.Component {
+  render() {
+    const rows = [];
+    
+    this.props.restaurants.forEach((restaurant) => {
+      rows.push(
+        <RestaurantResultRow
+        restaurant={restaurant}
+          key={restaurant.name} />
+      );
+    });
+
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+    );
+  }
+}
+
+class RestaurantSearch extends React.Component {
+  render() {
+    const restaurants = this.props.restaurants;
+
+    return (
       <div>
-        BROWSE
+        <RestaurantResultTable restaurants={restaurants}/>
       </div>
     );
   }
 }
 
 class Content extends React.Component {
-
   render() {
+    const restaurants = this.props.restaurants;
     return (
-          <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a href="#">Browse</a></li>
-            <li role="presentation"><a href="#">MyList</a></li>
-          </ul>
+      <div>
+        <div className="row">
+          <div className="col-xs-12">
+            < NavBar />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs-6">
+          < RestaurantSearch restaurants={restaurants}/>
+          </div>
+          <div className="col-xs-6">
+          </div>
+        </div>
+      </div>
     );
   }
 }
 
 class Layout extends React.Component {
-
   render() {
+    const restaurants = this.props.restaurants;
     return (
       <div className="container">
         <div className="row">
@@ -79,7 +139,7 @@ class Layout extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            <Content />
+            <Content restaurants={restaurants}/>
           </div>
         </div>
       </div>
@@ -87,7 +147,17 @@ class Layout extends React.Component {
   }
 }
 
+var restaurants;
+function setRestaurants(json) {
+  console.log(json)
+  restaurants = json;
+}
+fetch("/getRestaurants")
+.then(response => response.json())
+    .then(json => setRestaurants(json))
+     
+
 ReactDOM.render(
-  <Layout />,
+  <Layout restaurants={restaurants = []}/>,
   document.getElementById('root')
 );
