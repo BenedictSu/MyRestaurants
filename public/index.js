@@ -1,3 +1,13 @@
+class Banner extends React.Component {
+  render() {
+    return (
+      <h1>
+        My Restaurant
+      </h1>
+    );
+  }
+}
+
 class EmailForm extends React.Component {
   constructor(props) {
     super(props);
@@ -19,10 +29,10 @@ class EmailForm extends React.Component {
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
-        <label>
-          Please enter your email address:
-          <input type="text" value={this.state.emailAddress} onChange={this.handleChange} />
-        </label>
+        <div className="form-group">
+          <label for="emailAddress">Please enter your email address:</label>
+          <input type="email" className="form-control" id="emailAddress" placeholder="Email" value={this.state.emailAddress} onChange={this.handleChange} />
+        </div>
         <input type="submit" value="Submit" />
       </form>
     );
@@ -44,12 +54,21 @@ class Layout extends React.Component {
 
   render() {
     return (
-      <div>
-        <div>
-          <EmailForm />
+      <div className="container">
+      <div className="row">
+          <div className="col-xs-12">
+            <Banner />
+          </div>
         </div>
-        <div>
-          <Browse />
+        <div className="row">
+          <div className="col-xs-12">
+            <EmailForm />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs-12">
+            <Browse />
+          </div>
         </div>
       </div>
     );
