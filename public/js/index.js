@@ -73,7 +73,6 @@ class EmailForm extends React.Component {
 
   handleSubmit(event) {
     let emailAddress = this.state.emailAddress;
-    alert('A name was submitted: ' + emailAddress);
     event.preventDefault();
     // dispatch action
     store.dispatch(enterEmail(emailAddress));
@@ -222,6 +221,7 @@ class Content extends React.Component {
 class Layout extends React.Component {
   render() {
     const restaurants = this.props.restaurants;
+    const email = this.props.email;
     return (
       <div className="container">
         <div className="row">
@@ -236,7 +236,7 @@ class Layout extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            <Content restaurants={restaurants} />
+            {DEFAULT != email && "" != email ? <Content restaurants={restaurants} /> : <div />}
           </div>
         </div>
       </div>
@@ -254,7 +254,7 @@ function fetchRestaurant() {
 const render = function () {
   var state = store.getState();
   ReactDOM.render(
-    <Layout restaurants={state.restaurantList.value} />,
+    <Layout restaurants={state.restaurantList.value} email={state.emailInput.value} />,
     document.getElementById('root')
   );
 };
