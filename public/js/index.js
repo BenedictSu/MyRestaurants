@@ -12,13 +12,29 @@ var retrieveRestaurants = restaurants => ({
   value: restaurants
 });
 
+var selectRestaurant = selectedRestaurants => ({
+  type: 'SELECT_RESTAURANTS',
+  value: selectedRestaurants
+});
+
 // reducer
 const restaurantList = function (state = { status: DEFAULT, value: DEFAULT }, action) {
   switch (action.type) {
-
     case 'RETRIEVE_RESTAURANTS':
       return Object.assign({}, state, {
         status: 'restaurants retrieved',
+        value: action.value
+      })
+    default:
+      return state;
+  }
+}
+
+const selectedRestaurantList = function (state = { status: DEFAULT, value: DEFAULT }, action) {
+  switch (action.type) {
+    case 'SELECT_RESTAURANTS':
+      return Object.assign({}, state, {
+        status: 'restaurants selected',
         value: action.value
       })
     default:
@@ -40,6 +56,7 @@ const emailInput = function (state = { status: DEFAULT, value: DEFAULT }, action
 
 const combineReducer = combineReducers({
   restaurantList,
+  selectedRestaurantList,
   emailInput
 });
 
@@ -108,14 +125,21 @@ class RestaurantResultRow extends React.Component {
     const restaurant = this.props.restaurant;
 
     return (
-      <tr>
-        <td>{restaurant.name}</td>
+      <tr className="row-restaurant">
+        <td className="name-restaurant">{restaurant.name}</td>
+        <td><button type="button" className="btn btn-success btn-toggle">Toggle</button></td>
       </tr>
     );
   }
 }
 
 class RestaurantResultTable extends React.Component {
+  componentDidUpdate(prevProps) {
+    if (this.props.restaurants !== prevProps.restaurants) {
+      initRestaurantSelection();
+    }
+  }
+
   render() {
     const rows = [];
 
@@ -130,10 +154,11 @@ class RestaurantResultTable extends React.Component {
     }
 
     return (
-      <table>
+      <table className="table table-bordered table-hover">
         <thead>
-          <tr>
+          <tr className="active">
             <th>Name</th>
+            <th>Select<br />/<br />Unselect</th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
@@ -203,6 +228,7 @@ class RestaurantSearch extends React.Component {
         <div>
           <DayTimePicker />
         </div>
+        <hr />
         <div>
           <RestaurantResultTable restaurants={restaurants} />
         </div>
@@ -214,6 +240,7 @@ class RestaurantSearch extends React.Component {
 class Content extends React.Component {
   render() {
     const restaurants = this.props.restaurants;
+    const selectedRestaurants = this.props.selectedRestaurants;
     return (
       <div>
         <div className="row">
@@ -226,6 +253,7 @@ class Content extends React.Component {
             < RestaurantSearch restaurants={restaurants} />
           </div>
           <div className="col-xs-6">
+            <RestaurantResultTable restaurants={selectedRestaurants} />
           </div>
         </div>
       </div>
@@ -251,7 +279,7 @@ class Layout extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            {DEFAULT != email && "" != email ? <Content restaurants={restaurants} /> : <div />}
+            {DEFAULT != email && "" != email ? <Content restaurants={restaurants} selectedRestaurants={selectedRestaurants} /> : <div />}
           </div>
         </div>
       </div>
@@ -281,7 +309,7 @@ function searchRestaurants(day, time) {
 const render = function () {
   var state = store.getState();
   ReactDOM.render(
-    <Layout restaurants={state.restaurantList.value} email={state.emailInput.value} />,
+    <Layout restaurants={state.restaurantList.value} selectedRestaurants={state.selectedRestaurantList.value} email={state.emailInput.value} />,
     document.getElementById('root')
   );
 };
@@ -289,3 +317,27 @@ const render = function () {
 
 store.subscribe(render);
 render();
+
+function initRestaurantSelection() {
+  $('.btn-toggle').off('click');
+  $('.btn-toggle').click(function (event) {
+    var selectedRestaurants = store.getState().selectedRestaurantList.value;
+    var restaurantName = $(this.closest('.row-restaurant')).find('.name-restaurant').text();
+
+    if (DEFAULT != selectedRestaurants) {
+      var originalLength = selectedRestaurants.length;
+
+      selectedRestaurants = jQuery.grep(selectedRestaurants, function (item) {
+        return item.name != restaurantName;
+      });
+
+      if (originalLength == selectedRestaurants.length) {
+        selectedRestaurants.push({ name: restaurantName });
+      }
+    } else {
+      selectedRestaurants = [{ name: restaurantName }];
+    }
+    store.dispatch(selectRestaurant(selectedRestaurants));
+    event.preventDefault();
+  });
+}
