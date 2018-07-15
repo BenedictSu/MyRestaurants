@@ -143,13 +143,55 @@ class RestaurantResultTable extends React.Component {
   }
 }
 
+class DayTimePicker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { inputtime: '' };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({ inputtime: event.target.value });
+  }
+
+  handleSubmit(event) {
+    let inputtime = this.state.inputtime;
+    event.preventDefault();
+  }
+
+  componentDidMount() {
+    $('.clockpicker').clockpicker();
+  }
+
+  render() {
+    return (
+      <div>
+        <div>
+          <div className="input-group clockpicker" data-autoclose="true">
+            <input type="text" className="form-control" onChange={this.handleChange} />
+            <span className="input-group-addon">
+              <span className="glyphicon glyphicon-time"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 class RestaurantSearch extends React.Component {
   render() {
     const restaurants = this.props.restaurants;
-
     return (
       <div>
-        <RestaurantResultTable restaurants={restaurants} />
+        <div>
+          <DayTimePicker />
+        </div>
+        <div>
+          <RestaurantResultTable restaurants={restaurants} />
+        </div>
       </div>
     );
   }
