@@ -64,7 +64,7 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE public.collection (
-    id integer NOT NULL,
+    id serial primary key,
     ownerid integer NOT NULL,
     collectionname text NOT NULL,
     isdeleted boolean NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE public.collection (
 --
 
 CREATE TABLE public.collectionitems (
-    id integer NOT NULL,
+    id serial primary key,
     collectionid integer NOT NULL,
     restaurantid integer NOT NULL,
     isdeleted boolean NOT NULL,
@@ -94,7 +94,7 @@ CREATE TABLE public.collectionitems (
 --
 
 CREATE TABLE public.operatinghours (
-    id integer NOT NULL,
+    id serial primary key,
     restaurantid integer NOT NULL,
     day text NOT NULL,
     openingtime time without time zone NOT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE public.operatinghours (
 --
 
 CREATE TABLE public.restaurants (
-    id integer NOT NULL,
+    id serial primary key,
     name text NOT NULL
 );
 
@@ -119,46 +119,9 @@ CREATE TABLE public.restaurants (
 --
 
 CREATE TABLE public.users (
-    id integer NOT NULL,
+    id serial primary key,
     email text NOT NULL
 );
-
-
---
--- TOC entry 2690 (class 2606 OID 16496)
--- Name: collection collection_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.collection
-    ADD CONSTRAINT collection_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2693 (class 2606 OID 16498)
--- Name: collectionitems collectionitems_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.collectionitems
-    ADD CONSTRAINT collectionitems_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2697 (class 2606 OID 16500)
--- Name: restaurants restaurants_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.restaurants
-    ADD CONSTRAINT restaurants_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 2699 (class 2606 OID 16502)
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
 
 --
 -- TOC entry 2694 (class 1259 OID 16503)
