@@ -145,18 +145,20 @@ class RestaurantResultTable extends React.Component {
 class DayTimePicker extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { inputtime: '' };
+    this.state = { inputday: '' };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {
-    this.setState({ inputtime: event.target.value });
+    this.setState({ inputday: event.target.value });
   }
 
   handleSubmit(event) {
-    let inputtime = this.state.inputtime;
+    let inputtime = $('#input-clockpicker').val();
+    let inputday = this.state.inputday;
+    searchRestaurants(inputday, inputtime)
     event.preventDefault();
   }
 
@@ -166,16 +168,29 @@ class DayTimePicker extends React.Component {
 
   render() {
     return (
-      <div>
-        <div>
-          <div className="input-group clockpicker" data-autoclose="true">
-            <input type="text" className="form-control" onChange={this.handleChange} />
-            <span className="input-group-addon">
-              <span className="glyphicon glyphicon-time"></span>
-            </span>
-          </div>
+      <form onSubmit={this.handleSubmit}>
+        <div className="form-group">
+          <select className="form-control" value={this.state.inputday} onChange={this.handleChange}>
+            <option value="" disabled>Please select</option>
+            <option value="*">Any day</option>
+            <option value="Mon">Monday</option>
+            <option value="Tue">Tueday</option>
+            <option value="Wed">Wednesday</option>
+            <option value="Thu">Thursday</option>
+            <option value="Fri">Friday</option>
+            <option value="Sat">Saturday</option>
+            <option value="Sun">Sunday</option>
+          </select>
         </div>
-      </div>
+        <div className="form-group input-group clockpicker" data-autoclose="true">
+          <input type="text" id="input-clockpicker" className="form-control" placeholder="mm:ss" />
+          <span className="input-group-addon">
+            <span className="glyphicon glyphicon-time"></span>
+          </span>
+        </div>
+
+        <button type="submit" className="btn btn-primary">Search</button>
+      </form>
     );
   }
 }
@@ -243,13 +258,25 @@ class Layout extends React.Component {
     );
   }
 }
-
+/*
 function fetchRestaurant() {
   fetch("/getRestaurants")
     .then(response => response.json())
     .then(json => store.dispatch(retrieveRestaurants(json)));
 }
-//fetchRestaurant();
+//fetchRestaurant();*/
+
+function searchRestaurants(day, time) {
+  var data = { day: day, time: time };
+
+  $.ajax({
+    type: 'POST',
+    url: '/searchRestaurants',
+    data: data
+  }).done(function (res) {
+    store.dispatch(retrieveRestaurants(res));
+  })
+}
 
 const render = function () {
   var state = store.getState();

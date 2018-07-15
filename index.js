@@ -3,7 +3,9 @@ var express = require('express'),
     path = require('path'),
     app = express(),
     fs = require('fs'),
-    config = require('./config');
+    config = require('./config'),
+    bodyParser = require("body-parser");
+
 
 // some environment variables
 app.set('port', config.port);
@@ -18,6 +20,9 @@ app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
 app.use(express.session());
 app.use(app.router);*/
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // dynamically include routes (Controller)
 fs.readdirSync(path.join(__dirname, '/controllers')).forEach(function (file) {
