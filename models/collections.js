@@ -16,16 +16,7 @@ Collections.addCollection = function (userId, collectionName, handler) {
         );
 
         var query =
-            "do" +
-            " $do$" +
-            " BEGIN" +
-            " IF EXISTS (SELECT id FROM collection where collection.ownerid = " + userId + " AND collection.collectionname = '" + collectionName.trim() + "') THEN" +
-            " " +
-            " ELSE" +
-            " insert into collection(ownerid,collectionname,isdeleted,lastupdateddate,lastupdatedby) values(" + userId + ", '" + collectionName.trim() + "', false, '" + now.toISOString() + "', " + userId + ");" +
-            " END IF;" +
-            " END;" +
-            " $do$";
+            " insert into collection(ownerid,collectionname,isdeleted,lastupdateddate,lastupdatedby) values(" + userId + ", '" + collectionName.trim() + "', false, '" + now.toISOString() + "', " + userId + ");";
 
         client.query(query, function (err, result) {
             done(); // closing the connection;
