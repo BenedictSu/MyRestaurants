@@ -238,10 +238,71 @@ class RestaurantSearch extends React.Component {
   }
 }
 
+class CollectionAdder extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { collectionName: '' };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({ collectionName: event.target.value });
+  }
+
+  handleSubmit(event) {
+    let collectionName = this.state.collectionName;
+    let email = this.props.email;
+    let selectedRestaurants = this.props.selectedRestaurants;
+    console.log(collectionName)
+    console.log(email)
+    console.log(selectedRestaurants)
+
+
+    event.preventDefault();
+
+    //login(emailAddress);
+    // dispatch action
+    //store.dispatch(enterEmail(emailAddress));
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="collectionName">Please enter your collection name:</label>
+          <input type="text" className="form-control" id="collectionName" placeholder="Collection name" value={this.state.collectionName} onChange={this.handleChange} />
+        </div>
+        <button type="submit" className="btn btn-primary">Save</button>
+      </form>
+    );
+  }
+}
+
+class RestaurantCollectionForm extends React.Component {
+  render() {
+    const selectedRestaurants = this.props.selectedRestaurants;
+    const email = this.props.email;
+    return (
+      <div>
+        <div>
+          <CollectionAdder selectedRestaurants={selectedRestaurants} email={email} />
+        </div>
+        <hr />
+        <div>
+          <RestaurantResultTable restaurants={selectedRestaurants} />
+        </div>
+      </div>
+    );
+  }
+}
+
 class Content extends React.Component {
   render() {
     const restaurants = this.props.restaurants;
     const selectedRestaurants = this.props.selectedRestaurants;
+    const email = this.props.email;
     return (
       <div>
         <div className="row">
@@ -254,7 +315,7 @@ class Content extends React.Component {
             < RestaurantSearch restaurants={restaurants} />
           </div>
           <div className="col-xs-6">
-            <RestaurantResultTable restaurants={selectedRestaurants} />
+            <RestaurantCollectionForm selectedRestaurants={selectedRestaurants} email={email} />
           </div>
         </div>
       </div>
@@ -265,6 +326,7 @@ class Content extends React.Component {
 class Layout extends React.Component {
   render() {
     const restaurants = this.props.restaurants;
+    const selectedRestaurants = this.props.selectedRestaurants;
     const email = this.props.email;
     return (
       <div className="container">
@@ -280,7 +342,7 @@ class Layout extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            {DEFAULT != email && "" != email ? <Content restaurants={restaurants} selectedRestaurants={selectedRestaurants} /> : <div />}
+            {DEFAULT != email && "" != email ? <Content restaurants={restaurants} selectedRestaurants={selectedRestaurants} email={email} /> : <div />}
           </div>
         </div>
       </div>
