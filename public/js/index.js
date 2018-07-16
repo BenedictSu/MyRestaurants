@@ -287,13 +287,6 @@ class Layout extends React.Component {
     );
   }
 }
-/*
-function fetchRestaurant() {
-  fetch("/getRestaurants")
-    .then(response => response.json())
-    .then(json => store.dispatch(retrieveRestaurants(json)));
-}
-//fetchRestaurant();*/
 
 function login(email) {
   var data = { email: email };
