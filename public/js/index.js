@@ -92,6 +92,7 @@ class EmailForm extends React.Component {
     let emailAddress = this.state.emailAddress;
     event.preventDefault();
     // dispatch action
+    login(emailAddress);
     store.dispatch(enterEmail(emailAddress));
   }
 
@@ -183,7 +184,7 @@ class DayTimePicker extends React.Component {
   handleSubmit(event) {
     let inputtime = $('#input-clockpicker').val();
     let inputday = this.state.inputday;
-    searchRestaurants(inputday, inputtime)
+    searchRestaurants(inputday, inputtime);
     event.preventDefault();
   }
 
@@ -293,6 +294,18 @@ function fetchRestaurant() {
     .then(json => store.dispatch(retrieveRestaurants(json)));
 }
 //fetchRestaurant();*/
+
+function login(email) {
+  var data = { email: email };
+
+  $.ajax({
+    type: 'POST',
+    url: '/login',
+    data: data
+  }).done(function (res) {
+
+  })
+}
 
 function searchRestaurants(day, time) {
   var data = { day: day, time: time };
