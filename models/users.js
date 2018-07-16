@@ -3,13 +3,13 @@ var dbPool = require('./database.js');
 var Users = function () {
 }
 
-Users.createOrGetId = function (data, handler) {
+Users.createUser = function (data, handler) {
     dbPool.connect(function (err, client, done) {
         if (err) {
             console.log("not able to get connection " + err);
         }
         console.log("email: " + data);
-        var query1 =
+        var query =
             "do" +
             " $do$" +
             " BEGIN" +
@@ -21,29 +21,39 @@ Users.createOrGetId = function (data, handler) {
             " END;" +
             " $do$";
 
-        var query2 =
-            "SELECT id FROM users where users.email = '" + data.trim() + "'";
-
-        client.query(query1, function (err, result) {
+        client.query(query, function (err, result) {
+            done(); // closing the connection;
             if (err) {
                 console.log(err);
             } else {
                 console.log("successfully inserted");
-                client.query(query2, function (err, result) {
-                    done(); // closing the connection;
-                    if (err) {
-                        console.log(err);
-                        handler({"id":0});
-                    } else {
-                        console.log("successfully retrieved user id");
-                        console.log("id retrieved: " + JSON.stringify(result.rows[0]));
-                        handler(result.rows[0]);
-                    }
-                });
+            }
+            handler(result);
+        });
+    });
+}
+
+Users.getId = function (data, handler) {
+    dbPool.connect(function (err, client, done) {
+        if (err) {
+            console.log("not able to get connection " + err);
+        }
+        console.log("email: " + data);
+
+        var query =
+            "SELECT id FROM users where users.email = '" + data.trim() + "'";
+
+        client.query(query, function (err, result) {
+            done(); // closing the connection;
+            if (err) {
+                console.log(err);
+                handler({ "id": 0 });
+            } else {
+                console.log("successfully retrieved user id");
+                console.log("id retrieved: " + JSON.stringify(result.rows[0]));
+                handler(result.rows[0]);
             }
         });
-
-        
     });
 }
 
