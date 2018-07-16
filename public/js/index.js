@@ -255,16 +255,9 @@ class CollectionAdder extends React.Component {
     let collectionName = this.state.collectionName;
     let email = this.props.email;
     let selectedRestaurants = this.props.selectedRestaurants;
-    console.log(collectionName)
-    console.log(email)
-    console.log(selectedRestaurants)
-
 
     event.preventDefault();
-
-    //login(emailAddress);
-    // dispatch action
-    //store.dispatch(enterEmail(emailAddress));
+    addCollection(email, collectionName, selectedRestaurants);
   }
 
   render() {
@@ -350,6 +343,7 @@ class Layout extends React.Component {
   }
 }
 
+// Ajax methods
 function login(email) {
   var data = { email: email };
 
@@ -374,6 +368,21 @@ function searchRestaurants(day, time) {
   })
 }
 
+function addCollection(email, collectionName, selectedRestaurants) {
+
+  var data = { email: email, collectionName: collectionName, selectedRestaurants: selectedRestaurants };
+
+  $.ajax({
+    type: 'POST',
+    url: '/addCollection',
+    data: data
+  }).done(function (res) {
+    console.log(res);
+   // store.dispatch(retrieveRestaurants(res));
+  })
+}
+
+// render
 const render = function () {
   var state = store.getState();
   ReactDOM.render(
@@ -382,10 +391,10 @@ const render = function () {
   );
 };
 
-
 store.subscribe(render);
 render();
 
+// helpers
 function initRestaurantSelection() {
   $('.btn-toggle').off('click');
   $('.btn-toggle').click(function (event) {

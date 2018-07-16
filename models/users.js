@@ -49,8 +49,7 @@ Users.getId = function (data, handler) {
                 console.log(err);
                 handler({ "id": 0 });
             } else {
-                console.log("successfully retrieved user id");
-                console.log("id retrieved: " + JSON.stringify(result.rows[0]));
+                console.log("user id retrieved: " + JSON.stringify(result.rows[0]));
                 handler(result.rows[0]);
             }
         });
