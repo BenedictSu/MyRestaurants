@@ -121,6 +121,39 @@ class Banner extends React.Component {
   }
 }
 
+class InvitationForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { emailAddress: '' };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({ emailAddress: event.target.value });
+  }
+
+  handleSubmit(event) {
+    const senderemail = this.props.email;
+    let recipientemail = this.state.emailAddress;
+    event.preventDefault();
+    invite(senderemail, recipientemail);
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="emailAddress">Please enter your friend's email address:</label>
+          <input type="email" className="form-control" id="emailAddress" placeholder="Email" value={this.state.emailAddress} onChange={this.handleChange} />
+        </div>
+        <button type="submit" className="btn btn-info">Invite</button>
+      </form>
+    );
+  }
+}
+
 class EmailForm extends React.Component {
   constructor(props) {
     super(props);
@@ -431,9 +464,12 @@ class Layout extends React.Component {
           </div>
         </div>
         <div className="row">
-          <div className="col-xs-12">
-            <EmailForm />
-          </div>
+          {DEFAULT != email && "" != email ?
+            <div className="col-xs-12">
+              <div className="col-xs-6" />
+              <div className="col-xs-6"><InvitationForm email={email}/></div>
+            </div>
+            : <div className="col-xs-12"><EmailForm /></div>}
         </div>
         <div className="row">
           <div className="col-xs-12">
@@ -461,6 +497,17 @@ function login(email) {
     data: data
   }).done(function (res) {
     store.dispatch(setCollections(res));
+  })
+}
+
+function invite(senderemail, recipientemail) {
+  var data = { senderemail: senderemail, recipientemail : recipientemail };
+  $.ajax({
+    type: 'POST',
+    url: '/sendMail',
+    data: data
+  }).done(function (res) {
+
   })
 }
 
