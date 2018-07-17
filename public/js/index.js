@@ -22,6 +22,11 @@ var setCollections = collections => ({
   value: collections
 });
 
+var setCurrentCollection = currentCollection => ({
+  type: 'SET_CURRENT_COLLECTION',
+  value: currentCollection
+});
+
 // reducer
 const restaurantList = function (state = { status: DEFAULT, value: DEFAULT }, action) {
   switch (action.type) {
@@ -71,11 +76,24 @@ const collectionList = function (state = { status: DEFAULT, value: DEFAULT }, ac
   }
 }
 
+const currentCollection = function (state = { status: DEFAULT, value: DEFAULT }, action) {
+  switch (action.type) {
+    case 'SET_CURRENT_COLLECTION':
+      return Object.assign({}, state, {
+        status: 'current collection set',
+        value: action.value
+      })
+    default:
+      return state;
+  }
+}
+
 const combineReducer = combineReducers({
   restaurantList,
   selectedRestaurantList,
   emailInput,
-  collectionList
+  collectionList,
+  currentCollection
 });
 
 // store
@@ -131,14 +149,27 @@ class NavBarItem extends React.Component {
   render() {
     const collection = this.props.collection;
     var id = collection.id;
+    var collectionname = collection.collectionname;
 
     return (
-      <li role="presentation" className="navbar-item" data-value={id}><a href="#">{collection.collectionname}</a></li>
+      <li role="presentation" className="navbar-item" id={'navbar-item-' + id} data-id={id} data-name={collectionname}>
+        <a href="#">{collectionname}</a>
+      </li>
     );
   }
 }
 
 class NavBar extends React.Component {
+  componentDidMount() {
+    $("#navbar-item-" + this.props.currentCollection.id).addClass('active');
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.collections !== prevProps.collections) {
+      initNavBar();
+    }
+  }
+
   render() {
     const collections = this.props.collections;
     const item = [];
@@ -152,7 +183,7 @@ class NavBar extends React.Component {
 
     return (
       <ul className="nav nav-tabs">
-        <li role="presentation" className="navbar-item active" data-value={0}><a href="#">Browse</a></li>
+        <li role="presentation" className="navbar-item" id='navbar-item-0' data-id='0' data-name={DEFAULT}><a href="#">Browse</a></li>
         {item}
       </ul>
     );
@@ -335,11 +366,12 @@ class Content extends React.Component {
     const selectedRestaurants = this.props.selectedRestaurants;
     const email = this.props.email;
     const collections = this.props.collections;
+    const currentCollection = this.props.currentCollection;
     return (
       <div>
         <div className="row">
           <div className="col-xs-12">
-            < NavBar collections={collections} />
+            < NavBar collections={collections} currentCollection={currentCollection} />
           </div>
         </div>
         <div className="row">
@@ -356,11 +388,16 @@ class Content extends React.Component {
 }
 
 class Layout extends React.Component {
+  componentDidMount() {
+    store.dispatch(setCurrentCollection({ 'id': 0, 'name': DEFAULT }));
+  }
+
   render() {
     const restaurants = this.props.restaurants;
     const selectedRestaurants = this.props.selectedRestaurants;
     const email = this.props.email;
     const collections = this.props.collections;
+    const currentCollection = this.props.currentCollection;
     return (
       <div className="container">
         <div className="row">
@@ -379,7 +416,8 @@ class Layout extends React.Component {
               <Content restaurants={restaurants}
                 selectedRestaurants={selectedRestaurants}
                 email={email}
-                collections={collections} />
+                collections={collections}
+                currentCollection={currentCollection} />
               : <div />}
           </div>
         </div>
@@ -433,7 +471,8 @@ const render = function () {
     <Layout restaurants={state.restaurantList.value}
       selectedRestaurants={state.selectedRestaurantList.value}
       email={state.emailInput.value}
-      collections={state.collectionList.value} />,
+      collections={state.collectionList.value}
+      currentCollection={state.currentCollection.value} />,
     document.getElementById('root')
   );
 };
@@ -462,6 +501,22 @@ function initRestaurantSelection() {
       selectedRestaurants = [{ name: restaurantName }];
     }
     store.dispatch(selectRestaurant(selectedRestaurants));
+    event.preventDefault();
+  });
+}
+
+function initNavBar() {
+  $('.navbar-item').off('click');
+  $('.navbar-item').click(function (event) {
+    var currentCollection = store.getState().currentCollection.value;
+    var selectedId = this.getAttribute("data-id");
+    var selectedName = this.getAttribute("data-name");
+
+    $("#navbar-item-" + currentCollection.id).removeClass('active');
+    $("#navbar-item-" + selectedId).addClass('active');
+
+    store.dispatch(setCurrentCollection({ 'id': selectedId, 'name': selectedName }));
+
     event.preventDefault();
   });
 }
