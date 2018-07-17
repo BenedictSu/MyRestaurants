@@ -12,7 +12,10 @@ Setup DB
 2) grant the Tables and Sequences priviledges to the db users  
   
 Setup app  
-1) from the directory /MyRestaurants, execute 'npm install' to get all the required modules  
+1) make a copy of /MyRestaurants/config/sample.js and rename it to index.js  
+2) update the db credentials in this newly created /MyRestaurants/config/index.js  
+2) from the directory /MyRestaurants, execute 'npm install' to get all the required modules  
   
 Running app  
-2) execute 'node [path/to/MyRestaurants]'  
+1) execute 'node path/to/MyRestaurants'  
+2) navigate to http://localhost:2000/ to start the interaction  
