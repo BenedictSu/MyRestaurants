@@ -127,13 +127,33 @@ class EmailForm extends React.Component {
   }
 }
 
-class NavBar extends React.Component {
-
+class NavBarItem extends React.Component {
   render() {
+    const collection = this.props.collection;
+    var id = collection.id;
+
+    return (
+      <li role="presentation" className="navbar-item" data-value={id}><a href="#">{collection.collectionname}</a></li>
+    );
+  }
+}
+
+class NavBar extends React.Component {
+  render() {
+    const collections = this.props.collections;
+    const item = [];
+    if (collections !== DEFAULT) {
+      for (var collection in collections) {
+        item.push(
+          <NavBarItem collection={collections[collection]} key={collections[collection].id} />
+        );
+      }
+    }
+
     return (
       <ul className="nav nav-tabs">
-        <li role="presentation" className="active"><a href="#">Browse</a></li>
-        <li role="presentation"><a href="#">MyList</a></li>
+        <li role="presentation" className="navbar-item active" data-value={0}><a href="#">Browse</a></li>
+        {item}
       </ul>
     );
   }
@@ -314,11 +334,12 @@ class Content extends React.Component {
     const restaurants = this.props.restaurants;
     const selectedRestaurants = this.props.selectedRestaurants;
     const email = this.props.email;
+    const collections = this.props.collections;
     return (
       <div>
         <div className="row">
           <div className="col-xs-12">
-            < NavBar />
+            < NavBar collections={collections} />
           </div>
         </div>
         <div className="row">
@@ -354,7 +375,12 @@ class Layout extends React.Component {
         </div>
         <div className="row">
           <div className="col-xs-12">
-            {DEFAULT != email && "" != email ? <Content restaurants={restaurants} selectedRestaurants={selectedRestaurants} email={email} /> : <div />}
+            {DEFAULT != email && "" != email ?
+              <Content restaurants={restaurants}
+                selectedRestaurants={selectedRestaurants}
+                email={email}
+                collections={collections} />
+              : <div />}
           </div>
         </div>
       </div>
