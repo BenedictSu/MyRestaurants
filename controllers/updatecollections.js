@@ -23,6 +23,7 @@ module.exports.controller = function (app) {
                                     result[item.id].restaurants.push({ 'name': item.name })
                                 }
                             });
+                            sseFunction();
                             res.status(200).send(result);
                         });
                     });

@@ -42,3 +42,39 @@ app.use('/static', express.static(path.join(__dirname, '/public')))
 http.createServer(app).listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
 });
+
+sseClients = [];
+
+
+app.get('/sse', function (req, res) {
+    console.log("start: /sse");
+
+    if (req.headers.accept && req.headers.accept == 'text/event-stream') {
+        if (req.url == '/sse') {
+            sseClients.push(res);
+            res.writeHead(200, {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive'
+            });
+            constructSSE(res, 1, 'data');
+        } else {
+            res.writeHead(404);
+            res.end();
+        }
+    }
+});
+
+function sendSSE() {
+    console.log("start: sendSSE");
+    sseClients.forEach(function (res) {
+        constructSSE(res, 1, 'data');
+    });
+}
+
+function constructSSE(res, id, data) {
+    res.write('id: ' + id + '\n');
+    res.write("data: " + data + '\n\n');
+  }
+
+sseFunction = sendSSE;

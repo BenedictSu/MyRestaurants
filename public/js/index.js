@@ -468,7 +468,7 @@ class Layout extends React.Component {
           {DEFAULT != email && "" != email ?
             <div className="col-xs-12">
               <div className="col-xs-6" />
-              <div className="col-xs-6"><InvitationForm email={email}/></div>
+              <div className="col-xs-6"><InvitationForm email={email} /></div>
             </div>
             : <div className="col-xs-12"><EmailForm /></div>}
         </div>
@@ -502,7 +502,7 @@ function login(email) {
 }
 
 function invite(senderemail, recipientemail) {
-  var data = { senderemail: senderemail, recipientemail : recipientemail };
+  var data = { senderemail: senderemail, recipientemail: recipientemail };
   $.ajax({
     type: 'POST',
     url: '/sendMail',
@@ -548,6 +548,19 @@ function updateCollection(email, collectionId, collectionName, selectedRestauran
   }).done(function (res) {
     store.dispatch(setCollections(res));
     $('#curcolname').text(collectionName);
+  })
+}
+
+function getCollection(email) {
+
+  var data = { email: email };
+
+  $.ajax({
+    type: 'POST',
+    url: '/getCollection',
+    data: data
+  }).done(function (res) {
+    store.dispatch(setCollections(res));
   })
 }
 
@@ -631,9 +644,21 @@ function autologin() {
 function getJsonFromUrl() {
   var query = location.search.substr(1);
   var result = {};
-  query.split("&").forEach(function(part) {
+  query.split("&").forEach(function (part) {
     var item = part.split("=");
     result[item[0]] = decodeURIComponent(item[1]);
   });
   return result;
+}
+
+// SSE conenction
+if (!!window.EventSource) {
+  var source = new EventSource('/sse');
+ 
+  source.addEventListener('message', function (e) {
+    var state = store.getState();
+    var email = state.emailInput.value;
+    if (DEFAULT != email)
+      getCollection(email);
+  }, false);
 }
