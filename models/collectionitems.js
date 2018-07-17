@@ -40,4 +40,30 @@ Collectionitems.addCollectionItems = function (userId, collectionId, collectionI
     });
 }
 
+Collectionitems.deleteCollectionItems = function (userId, collectionId, handler) {
+    dbPool.connect(function (err, client, done) {
+        if (err) {
+            console.log("not able to get connection " + err);
+        }
+        console.log("userId: " + userId + "collectionId: " + collectionId);
+        var nowWithTimezone = new Date();
+        var now = new Date(Date.UTC(
+            nowWithTimezone.getFullYear(), nowWithTimezone.getMonth(), nowWithTimezone.getDate(), nowWithTimezone.getHours(), nowWithTimezone.getMinutes(), nowWithTimezone.getSeconds(), nowWithTimezone.getMilliseconds())
+        );
+
+        var query =
+            "UPDATE collectionitems SET (isdeleted, lastupdateddate, lastupdatedby) = (true, '" + now.toISOString() + "', " + userId + ") WHERE collectionid = " + collectionId + ";";
+
+        client.query(query, function (err, result) {
+            done(); // closing the connection;
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("successfully deleted");
+            }
+            handler(result);
+        });
+    });
+}
+
 module.exports = Collectionitems;

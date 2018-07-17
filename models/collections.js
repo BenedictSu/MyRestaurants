@@ -30,6 +30,33 @@ Collections.addCollection = function (userId, collectionName, handler) {
     });
 }
 
+Collections.updateCollection = function (userId, collectionId, collectionName, handler) {
+
+    dbPool.connect(function (err, client, done) {
+        if (err) {
+            console.log("not able to get connection " + err);
+        }
+        console.log("userId: " + userId + "collectionId: " + collectionId + ", collectionName: " + collectionName);
+        var nowWithTimezone = new Date();
+        var now = new Date(Date.UTC(
+            nowWithTimezone.getFullYear(), nowWithTimezone.getMonth(), nowWithTimezone.getDate(), nowWithTimezone.getHours(), nowWithTimezone.getMinutes(), nowWithTimezone.getSeconds(), nowWithTimezone.getMilliseconds())
+        );
+
+        var query =
+            "UPDATE collection SET (collectionname, lastupdateddate, lastupdatedby) = ('" + collectionName.trim() + "', '" + now.toISOString() + "', " + userId + ") WHERE id = " + collectionId + ";";
+
+        client.query(query, function (err, result) {
+            done(); // closing the connection;
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("successfully updated");
+            }
+            handler(result);
+        });
+    });
+}
+
 Collections.getId = function (collectionName, handler) {
     dbPool.connect(function (err, client, done) {
         if (err) {

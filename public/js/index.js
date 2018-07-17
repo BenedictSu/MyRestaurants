@@ -334,20 +334,30 @@ class CollectionAdder extends React.Component {
     let collectionName = this.state.collectionName;
     let email = this.props.email;
     let selectedRestaurants = this.props.selectedRestaurants;
+    let currentCollection = this.props.currentCollection;
 
     event.preventDefault();
-    addCollection(email, collectionName, selectedRestaurants);
+    if (currentCollection.id == 0) {
+      addCollection(email, collectionName, selectedRestaurants);
+    } else {
+      updateCollection(email, currentCollection.id, collectionName, selectedRestaurants);
+    }
+
   }
 
   render() {
+    const currentCollection = this.props.currentCollection;
     return (
-      <form onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="collectionName">Please enter your collection name:</label>
-          <input type="text" className="form-control" id="collectionName" placeholder="Collection name" value={this.state.collectionName} onChange={this.handleChange} />
-        </div>
-        <button type="submit" className="btn btn-primary">Save</button>
-      </form>
+      <div>
+        {currentCollection.id != 0 ? <h4>Current Collection Name: <b id='curcolname'>{currentCollection.name}</b></h4> : <div />}
+        <form onSubmit={this.handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="collectionName">{currentCollection.id != 0 ? "Please enter your new collection name:" : "Please enter your collection name:"}</label>
+            <input type="text" className="form-control" id="collectionName" placeholder="Collection name" value={this.state.collectionName} onChange={this.handleChange} />
+          </div>
+          <button type="submit" className="btn btn-primary">{currentCollection.id != 0 ? "update" : "save"}</button>
+        </form>
+      </div>
     );
   }
 }
@@ -356,10 +366,13 @@ class RestaurantCollectionForm extends React.Component {
   render() {
     const selectedRestaurants = this.props.selectedRestaurants;
     const email = this.props.email;
+    const currentCollection = this.props.currentCollection;
     return (
       <div>
         <div>
-          <CollectionAdder selectedRestaurants={selectedRestaurants} email={email} />
+          <CollectionAdder selectedRestaurants={selectedRestaurants}
+            email={email}
+            currentCollection={currentCollection} />
         </div>
         <hr />
         <div>
@@ -389,7 +402,9 @@ class Content extends React.Component {
             < RestaurantSearch restaurants={restaurants} />
           </div>
           <div className="col-xs-6">
-            <RestaurantCollectionForm selectedRestaurants={selectedRestaurants} email={email} />
+            <RestaurantCollectionForm selectedRestaurants={selectedRestaurants}
+              email={email}
+              currentCollection={currentCollection} />
           </div>
         </div>
       </div>
@@ -471,6 +486,20 @@ function addCollection(email, collectionName, selectedRestaurants) {
     data: data
   }).done(function (res) {
     store.dispatch(setCollections(res));
+  })
+}
+
+function updateCollection(email, collectionId, collectionName, selectedRestaurants) {
+
+  var data = { email: email, collectionId: collectionId, collectionName: collectionName, selectedRestaurants: selectedRestaurants };
+
+  $.ajax({
+    type: 'POST',
+    url: '/updateCollection',
+    data: data
+  }).done(function (res) {
+    store.dispatch(setCollections(res));
+    $('#curcolname').text(collectionName);
   })
 }
 
