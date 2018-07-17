@@ -17,6 +17,11 @@ var selectRestaurant = selectedRestaurants => ({
   value: selectedRestaurants
 });
 
+var setCollections = collections => ({
+  type: 'SET_COLLECTIONS',
+  value: collections
+});
+
 // reducer
 const restaurantList = function (state = { status: DEFAULT, value: DEFAULT }, action) {
   switch (action.type) {
@@ -54,10 +59,23 @@ const emailInput = function (state = { status: DEFAULT, value: DEFAULT }, action
   }
 }
 
+const collectionList = function (state = { status: DEFAULT, value: DEFAULT }, action) {
+  switch (action.type) {
+    case 'SET_COLLECTIONS':
+      return Object.assign({}, state, {
+        status: 'collections set',
+        value: action.value
+      })
+    default:
+      return state;
+  }
+}
+
 const combineReducer = combineReducers({
   restaurantList,
   selectedRestaurantList,
-  emailInput
+  emailInput,
+  collectionList
 });
 
 // store
@@ -321,6 +339,7 @@ class Layout extends React.Component {
     const restaurants = this.props.restaurants;
     const selectedRestaurants = this.props.selectedRestaurants;
     const email = this.props.email;
+    const collections = this.props.collections;
     return (
       <div className="container">
         <div className="row">
@@ -352,7 +371,7 @@ function login(email) {
     url: '/login',
     data: data
   }).done(function (res) {
-
+    store.dispatch(setCollections(res));
   })
 }
 
@@ -377,8 +396,7 @@ function addCollection(email, collectionName, selectedRestaurants) {
     url: '/addCollection',
     data: data
   }).done(function (res) {
-    console.log(res);
-   // store.dispatch(retrieveRestaurants(res));
+    store.dispatch(setCollections(res));
   })
 }
 
@@ -386,7 +404,10 @@ function addCollection(email, collectionName, selectedRestaurants) {
 const render = function () {
   var state = store.getState();
   ReactDOM.render(
-    <Layout restaurants={state.restaurantList.value} selectedRestaurants={state.selectedRestaurantList.value} email={state.emailInput.value} />,
+    <Layout restaurants={state.restaurantList.value}
+      selectedRestaurants={state.selectedRestaurantList.value}
+      email={state.emailInput.value}
+      collections={state.collectionList.value} />,
     document.getElementById('root')
   );
 };

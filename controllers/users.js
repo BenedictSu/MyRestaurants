@@ -1,3 +1,4 @@
+var collections = require('../models/collections');
 var model = require('../models/users');
 
 module.exports.controller = function (app) {
@@ -5,7 +6,22 @@ module.exports.controller = function (app) {
         console.log("start: /login");
         model.createUser(req.body.email, function (data) {
             model.getId(req.body.email, function (row) {
-                res.status(200).send(row);
+                var userId = row.id;
+                collections.getCollections(userId, function (row) {
+                    var result = {};
+                    row.map(function (item) {
+                        if (!result[item.id]) {
+                            result[item.id] = {
+                                'id': item.id,
+                                'collectionname': item.collectionname,
+                                'name': [item.name]
+                            };
+                        } else {
+                            result[item.id].name.push(item.name)
+                        }
+                    });
+                    res.status(200).send(result);
+                });
             });
         });
     });
