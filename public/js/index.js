@@ -17,6 +17,11 @@ var selectRestaurant = selectedRestaurants => ({
   value: selectedRestaurants
 });
 
+var resetRestaurant = selectedRestaurants => ({
+  type: 'RESET_RESTAURANTS',
+  value: selectedRestaurants
+});
+
 var setCollections = collections => ({
   type: 'SET_COLLECTIONS',
   value: collections
@@ -34,6 +39,11 @@ const restaurantList = function (state = { status: DEFAULT, value: DEFAULT }, ac
       return Object.assign({}, state, {
         status: 'restaurants retrieved',
         value: action.value
+      })
+    case 'RESET_RESTAURANTS':
+      return Object.assign({}, state, {
+        status: DEFAULT,
+        value: DEFAULT
       })
     default:
       return state;
@@ -508,14 +518,25 @@ function initRestaurantSelection() {
 function initNavBar() {
   $('.navbar-item').off('click');
   $('.navbar-item').click(function (event) {
-    var currentCollection = store.getState().currentCollection.value;
+    var state = store.getState();
+    var currentCollection = state.currentCollection.value;
     var selectedId = this.getAttribute("data-id");
     var selectedName = this.getAttribute("data-name");
+    var collectionList = state.collectionList.value;
 
+    // update currentCollection selected
     $("#navbar-item-" + currentCollection.id).removeClass('active');
     $("#navbar-item-" + selectedId).addClass('active');
 
     store.dispatch(setCurrentCollection({ 'id': selectedId, 'name': selectedName }));
+
+    // reset form
+    store.dispatch(resetRestaurant(DEFAULT));
+    if (null != collectionList[selectedId]) {
+      store.dispatch(selectRestaurant(collectionList[selectedId].restaurants));
+    } else {
+      store.dispatch(selectRestaurant(DEFAULT));
+    }
 
     event.preventDefault();
   });

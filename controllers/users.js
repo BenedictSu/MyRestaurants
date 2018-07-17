@@ -14,10 +14,10 @@ module.exports.controller = function (app) {
                             result[item.id] = {
                                 'id': item.id,
                                 'collectionname': item.collectionname,
-                                'name': [item.name]
+                                'restaurants': [{ 'name': item.name }]
                             };
                         } else {
-                            result[item.id].name.push(item.name)
+                            result[item.id].restaurants.push({ 'name': item.name })
                         }
                     });
                     res.status(200).send(result);
