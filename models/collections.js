@@ -53,4 +53,37 @@ Collections.getId = function (collectionName, handler) {
     });
 }
 
+Collections.getCollections = function (userId, handler) {
+    dbPool.connect(function (err, client, done) {
+        if (err) {
+            console.log("not able to get connection " + err);
+        }
+        console.log("userId: " + userId);
+
+        var query =
+            "SELECT" +
+            " col.id, col.collectionname, res.name" +
+            " FROM" +
+            " collection as col join collectionitems as citem" +
+            " ON col.id = citem.collectionid" +
+            " join restaurants as res" +
+            " ON citem.restaurantid = res.id" +
+            " WHERE" +
+            " col.ownerid = " + userId +
+            " AND citem.isdeleted = false" +
+            " ORDER BY col.id ASC;";
+
+        client.query(query, function (err, result) {
+            done(); // closing the connection;
+            if (err) {
+                console.log(err);
+                handler({});
+            } else {
+                console.log("collection retrieved: " + JSON.stringify(result.rows));
+                handler(result.rows);
+            }
+        });
+    });
+}
+
 module.exports = Collections;

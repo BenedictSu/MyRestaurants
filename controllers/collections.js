@@ -11,13 +11,21 @@ module.exports.controller = function (app) {
                 collections.getId(req.body.collectionName, function (row) {
                     var collectionId = row.id;
                     collectionitems.addCollectionItems(userId, collectionId, req.body.selectedRestaurants, function (row) {
-
-
-
-
-
-
-                        res.status(200).send(row);
+                        collections.getCollections(userId, function (row) {
+                            var result = {};
+                            row.map(function (item) {
+                                if (!result[item.id]) {
+                                    result[item.id] = {
+                                        'id': item.id,
+                                        'collectionname': item.collectionname,
+                                        'name': [item.name]
+                                    };
+                                } else {
+                                    result[item.id].name.push(item.name)
+                                }
+                            });
+                            res.status(200).send(result);
+                        });
                     });
                 });
             });
