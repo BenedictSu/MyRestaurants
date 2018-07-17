@@ -448,6 +448,7 @@ class Content extends React.Component {
 class Layout extends React.Component {
   componentDidMount() {
     store.dispatch(setCurrentCollection({ 'id': 0, 'name': DEFAULT }));
+    autologin();
   }
 
   render() {
@@ -616,4 +617,23 @@ function initNavBar() {
 
     event.preventDefault();
   });
+}
+
+function autologin() {
+  var queryString = getJsonFromUrl();
+  if (queryString['email']) {
+    var emailAddress = queryString['email'];
+    login(emailAddress);
+    store.dispatch(enterEmail(emailAddress));
+  }
+}
+
+function getJsonFromUrl() {
+  var query = location.search.substr(1);
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
 }
