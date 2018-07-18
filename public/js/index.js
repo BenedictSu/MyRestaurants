@@ -497,6 +497,12 @@ function login(email) {
     url: '/login',
     data: data
   }).done(function (res) {
+    var state = store.getState();
+    var currentCollection = state.currentCollection.value;
+    if (res[currentCollection.id]) {
+      store.dispatch(selectRestaurant(res[currentCollection.id].restaurants));
+      store.dispatch(setCurrentCollection({ 'id': currentCollection.id, 'name': res[currentCollection.id].collectionname }));
+    }
     store.dispatch(setCollections(res));
   })
 }
@@ -533,6 +539,12 @@ function addCollection(email, collectionName, selectedRestaurants) {
     url: '/addCollection',
     data: data
   }).done(function (res) {
+    var state = store.getState();
+    var currentCollection = state.currentCollection.value;
+    if (res[currentCollection.id]) {
+      store.dispatch(selectRestaurant(res[currentCollection.id].restaurants));
+      store.dispatch(setCurrentCollection({ 'id': currentCollection.id, 'name': res[currentCollection.id].collectionname }));
+    }
     store.dispatch(setCollections(res));
   })
 }
@@ -546,8 +558,13 @@ function updateCollection(email, collectionId, collectionName, selectedRestauran
     url: '/updateCollection',
     data: data
   }).done(function (res) {
+    var state = store.getState();
+    var currentCollection = state.currentCollection.value;
+    if (res[currentCollection.id]) {
+      store.dispatch(selectRestaurant(res[currentCollection.id].restaurants));
+      store.dispatch(setCurrentCollection({ 'id': currentCollection.id, 'name': res[currentCollection.id].collectionname }));
+    }
     store.dispatch(setCollections(res));
-    $('#curcolname').text(collectionName);
   })
 }
 
@@ -560,6 +577,12 @@ function getCollection(email) {
     url: '/getCollection',
     data: data
   }).done(function (res) {
+    var state = store.getState();
+    var currentCollection = state.currentCollection.value;
+    if (res[currentCollection.id]) {
+      store.dispatch(selectRestaurant(res[currentCollection.id].restaurants));
+      store.dispatch(setCurrentCollection({ 'id': currentCollection.id, 'name': res[currentCollection.id].collectionname }));
+    }
     store.dispatch(setCollections(res));
   })
 }
@@ -651,10 +674,10 @@ function getJsonFromUrl() {
   return result;
 }
 
-// SSE conenction
+// SSE connection
 if (!!window.EventSource) {
   var source = new EventSource('/sse');
- 
+
   source.addEventListener('message', function (e) {
     var state = store.getState();
     var email = state.emailInput.value;
